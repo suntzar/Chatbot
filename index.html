@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Chatbot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .chatbot {
+            width: 300px;
+            margin: 20px auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .header {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .messages {
+            height: 200px;
+            overflow-y: scroll;
+            border: 1px solid #ddd;
+            padding: 10px;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 5px;
+            margin-top: 10px;
+        }
+        button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="chatbot">
+        <div class="header">Chatbot</div>
+        <div class="messages" id="messages"></div>
+        <input type="text" id="userInput" placeholder="Digite sua mensagem...">
+        <button onclick="sendMessage()">Enviar</button>
+    </div>
+    <script>
+        async function sendMessage() {
+            const userInput = document.getElementById("userInput").value;
+
+            try {
+                const response = await fetch("/chat", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ message: userInput }),
+                });
+
+                const data = await response.json();
+                displayBotResponse(data.response);
+            } catch (error) {
+                console.error("Erro ao enviar mensagem:", error);
+            }
+        }
+
+        function displayBotResponse(response) {
+            const messagesDiv = document.getElementById("messages");
+            const botMessage = document.createElement("div");
+            botMessage.innerText = response;
+            messagesDiv.appendChild(botMessage);
+
+            // Limpa o campo de entrada
+            document.getElementById("userInput").value = "";
+        }
+    </script>
+</body>
+</html>

@@ -1,32 +1,31 @@
-// server.js
-const express = require("express");
-const { GoogleGenerativeAI } = require("@google/generative-ai");
+
+const express = require('express');
+const bodyParser = require('body-parser');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 const app = express();
-const port = process.env.PORT || 3000; // Porta do servidor
+app.use(bodyParser.json());
+app.use(express.static('public')); // Serve arquivos estáticos da pasta 'public'
 
-// Configuração do modelo Gemini
-const apiKey = "AIzaSyAeGh0hB_nerwQfsx2UWN0pyZ0r8r3Gd7o"; // Substitua pela sua chave
-const genAI = new GoogleGenerativeAI(apiKey);
-const model = genAI.getGenerativeModel({
-  model: "gemini-1.5-flash",
-  systemInstruction: "Seu nome é Lucas",
+const genAI = new GoogleGenerativeAI('AIzaSyAeGh0hB_nerwQfsx2UWN0pyZ0r8r3Gd7o');
+
+app.post('/mensagem', async (req, res) => {
+  const prompt = req.body.texto;
+  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+
+  try {
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
+    res.json({ resposta: text });
+  } catch (error) {
+    console.error('Erro ao gerar conteúdo:', error);
+    res.status(500).send('Erro ao processar a mensagem');
+  }
 });
 
-// Rota para receber mensagens do usuário
-app.use(express.json()); // Middleware para processar JSON
-app.post("/chat", async (req, res) => {
-  const userMessage = req.body.message; // Mensagem enviada pelo usuário
-
-  // Envia a mensagem para o modelo Gemini
-  const chatSession = model.startChat();
-  const result = await chatSession.sendMessage(userMessage);
-
-  // Retorna a resposta gerada pelo modelo
-  res.json({ response: result.response.text() });
+const PORT = Math.floor(Math.random() * (65535 - 1024 + 1)) + 1024;
+app.listen(PORT, () => {
+  console.log(`Servidor rodando na porta ${PORT}:`);
+  console.log(`localhost:${PORT}`);
 });
-
-app.listen(port, () => {
-  console.log(`Servidor rodando na porta ${port}`);
-});
-

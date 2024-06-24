@@ -24,7 +24,7 @@ app.post('/mensagem', async (req, res) => {
   }
 });
 
-const PORT = Math.floor(Math.random() * (65535 - 1024 + 1)) + 1024;
+const PORT = 5000;
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}:`);
   console.log(`localhost:${PORT}`);
